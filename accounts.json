@@ -1,0 +1,9 @@
+[
+  {"username": "test1", "password": "afhkjdashfkjadhfkahdfkajsd", "panel": "panel0.serv00.com"},
+  {"username": "test2", "password": "afhkjdashfkjadhfkahdfkajsd", "panel": "panel1.serv00.com"},
+  {"username": "test3", "password": "afhkjdashfkjadhfkahdfkajsd", "panel": "panel2.serv00.com"},
+  {"username": "test4", "password": "afhkjdashfkjadhfkahdfkajsd", "panel": "panel3.serv00.com"},
+  {"username": "test5", "password": "afhkjdashfkjadhfkahdfkajsd", "panel": "panel4.serv00.com"},
+  {"username": "test6", "password": "afhkjdashfkjadhfkahdfkajsd", "panel": "panel5.serv00.com"},
+  {"username": "test7", "password": "afhkjdashfkjadhfkahdfkajsd", "panel": "panel6.serv00.com"}
+]
