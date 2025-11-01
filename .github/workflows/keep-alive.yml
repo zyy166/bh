@@ -1,0 +1,45 @@
+name: Keep GitHub Actions Alive
+
+on:
+  schedule:
+    # 每天凌晨 3 点跑一次 (UTC 时间)
+    - cron: '0 3 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 必须给予写权限才能推送 commit
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # 只拉取最新的 commit
+
+      - name: Get Last Commit Date
+        id: last_commit_date
+        run: |
+          # 获取最后一次 commit 距离现在的天数
+          LAST_COMMIT_DATE=$(git log -1 --format=%ct)
+          CURRENT_DATE=$(date +%s)
+          DAYS_SINCE_LAST_COMMIT=$(( ($CURRENT_DATE - $LAST_COMMIT_DATE) / 86400 ))
+          echo "Days since last commit: $DAYS_SINCE_LAST_COMMIT"
+          echo "days_diff=$DAYS_SINCE_LAST_COMMIT" >> $GITHUB_OUTPUT
+
+      - name: Create Empty Commit
+        # 仅当距离上次 commit 超过 45 天时才执行
+        if: steps.last_commit_date.outputs.days_diff > 45
+        run: |
+          echo "Creating empty commit to keep workflow alive..."
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit --allow-empty -m "ci: keep workflow alive"
+          git push
+
+      - name: Check Status (If No Commit Needed)
+        # 如果不需要提交（即 45 天内有过活动），就打印一条消息
+        if: steps.last_commit_date.outputs.days_diff <= 45
+        run: |
+          echo "Repository is active. No keep-alive commit needed."
