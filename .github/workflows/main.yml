@@ -1,12 +1,17 @@
 name: Run Login Script
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: "0 12 1 */2 *"  # 每两个月一次，每次在1号晚上8点运行，可以根据需求调整时间
-  push:
-    branches:
+  workflow_dispatch: # 保留: 允许你手动运行
+  
+  # --- 关键修改 ---
+  # 下面的 'schedule' (定时运行) 部分已被移除
+  # schedule:
+  #   - cron: "0 13 1 */2 *"  # (已移除)
+  
+  push: # 只在 push 时运行 (包括 keep-alive.yml 的自动 push)
+    分支:
       - main
+
 jobs:
   login:
     runs-on: ubuntu-latest
@@ -25,12 +30,9 @@ jobs:
         env:
             ACCOUNTS_JSON: ${{ secrets.ACCOUNTS_JSON }}
 
-      # --- 移除: 安装系统 Chromium 的步骤 ---
-
       - name: 安装 Python 依赖
         run: |
           python -m pip install --upgrade pip
-          # --- 重新添加 pyppeteer-stealth ---
           pip install pyppeteer aiofiles requests pyppeteer-stealth
           pip install --upgrade pyppeteer
 
@@ -39,12 +41,11 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ACCOUNTS_JSON: ${{ secrets.ACCOUNTS_JSON }}
-          # --- 移除: CHROME_PATH 环境变量 ---
         run: |
           python login_script.py
 
       - name: Upload error screenshots (上传错误截图)
-        # --- 关键: 仅在脚本失败时 (sys.exit(1)) 才运行 ---
+        # 仅在脚本失败时 (sys.exit(1)) 才运行
         if: failure()
         uses: actions/upload-artifact@v4
         with:
