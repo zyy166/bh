@@ -3,7 +3,7 @@ name: Run Login Script
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 13 1 */2 *"  # 每两个月一次，每次在1号晚上9点运行，可以根据需求调整时间
+    - cron: "0 13 1 */2 *"  # 每两个月一次，每次在1号晚上9点运行
   push:
     branches:
       - main
@@ -13,12 +13,12 @@ jobs:
 
     steps:
       - name: Checkout 仓库代码
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3 # <-- 更新到 v3
 
       - name: 设置 Python 环境
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4 # <-- 更新到 v4
         with:
-          python-version: '3.x'  # 设置你希望使用的 Python 版本，建议使用稳定版本
+          python-version: '3.10'  # <-- 建议使用明确的版本
 
       - name: Create accounts.json from environment variable
         run: echo "$ACCOUNTS_JSON" > accounts.json
@@ -29,12 +29,24 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pyppeteer aiofiles requests
-          pip install --upgrade pyppeteer
+          # pip install --upgrade pyppeteer # 已包含在上一行，无需重复
 
       - name: 运行登录脚本
+        # 备注: 确保您的Python脚本文件名确实是 login_script.py
+        run: |
+          python login_script.py
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ACCOUNTS_JSON: ${{ secrets.ACCOUNTS_JSON }}
-        run: |
-          python login_script.py
+
+      # --- 这是新添加的步骤 ---
+      - name: Upload error screenshots (上传错误截图)
+        # 仅在前面的步骤失败时运行
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: error-screenshots
+          path: ./*.png # 上传当前目录下所有的 .png 文件
+      # --- 添加结束 ---
+
