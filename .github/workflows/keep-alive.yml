@@ -2,8 +2,8 @@ name: Keep GitHub Actions Alive
 
 on:
   schedule:
-    # 每天凌晨 3 点跑一次 (UTC 时间)
-    - cron: '0 3 * * *'
+    # 每天 01:00 (UTC 时间) / 09:00 (北京时间) 运行
+    - cron: '0 1 * * *'
   workflow_dispatch: # 允许手动触发
 
 jobs:
@@ -43,3 +43,4 @@ jobs:
         if: steps.last_commit_date.outputs.days_diff <= 45
         run: |
           echo "Repository is active. No keep-alive commit needed."
+
