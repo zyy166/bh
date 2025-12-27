@@ -2,15 +2,8 @@ name: Run Login Script
 
 on:
   workflow_dispatch: # 保留: 允许你手动运行
-  
-  # --- 关键修改 ---
-  # 下面的 'schedule' (定时运行) 部分已被移除
-  # schedule:
-  #   - cron: "0 13 1 */2 *"  # (已移除)
-  
-  push: # 只在 push 时运行 (包括 keep-alive.yml 的自动 push)
-    分支:
-      - main
+  schedule:
+     - cron: "0 13 1 */2 *"
 
 jobs:
   login:
